@@ -6,7 +6,7 @@
     <title>Chris Miglioranzi</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -14,797 +14,337 @@
             box-sizing: border-box;
         }
 
-        body {
-            background: #050505;
-            color: #f0f0f0;
-            font-family: 'Inter', sans-serif;
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
-            cursor: crosshair;
+        :root {
+            --bg: #09090b;
+            --fg: #fafafa;
+            --muted: #a1a1aa;
+            --muted-2: #71717a;
+            --border: rgba(255, 255, 255, 0.1);
         }
 
-        /* Matrix rain canvas - behind everything */
-        #matrix {
+        body {
+            background: var(--bg);
+            color: var(--fg);
+            font-family: 'Inter', system-ui, sans-serif;
+            font-feature-settings: 'cv11';
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── Flickering grid background (MagicUI) ── */
+        #flickering-grid {
             position: fixed;
-            top: 0;
-            left: 0;
+            inset: 0;
             width: 100%;
             height: 100%;
             z-index: 0;
-        }
-
-        /* Interactive grid canvas */
-        #grid {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        /* Radial glow that follows cursor */
-        .cursor-glow {
-            position: fixed;
-            width: 600px;
-            height: 600px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(200, 20, 20, 0.03) 0%, transparent 70%);
             pointer-events: none;
-            z-index: 2;
-            transform: translate(-50%, -50%);
-            transition: opacity 0.3s;
-            opacity: 0;
+            -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, black 30%, transparent 100%);
+            mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, black 30%, transparent 100%);
         }
-
-        body:hover .cursor-glow {
-            opacity: 1;
-        }
-
-        /* Scan line effect */
-        .scanlines {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 3;
-            pointer-events: none;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 2px,
-                rgba(0, 0, 0, 0.03) 2px,
-                rgba(0, 0, 0, 0.03) 4px
-            );
-        }
-
 
         .hero {
             position: relative;
-            z-index: 5;
+            z-index: 1;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 2rem;
+            gap: 3rem;
+            padding: 2rem 1.5rem;
             text-align: center;
         }
 
-        .name-container {
-            position: relative;
-            margin-bottom: 3rem;
-            opacity: 0;
-            animation: fadeIn 1s ease forwards 0.3s;
-        }
-
-        .name-container canvas {
-            display: block;
-        }
-
-        .name-hidden {
-            position: absolute;
-            visibility: hidden;
-            font-size: clamp(3.5rem, 9vw, 8rem);
-            font-weight: 900;
-            text-transform: uppercase;
-            letter-spacing: -0.02em;
-            line-height: 1.1;
-            white-space: nowrap;
-            font-family: 'Inter', sans-serif;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        /* Stats section */
-        .stats {
-            display: flex;
-            gap: 4rem;
-            margin-bottom: 3.5rem;
-            opacity: 0;
-            animation: fadeUp 1s ease forwards 0.7s;
-        }
-
-        .stat {
-            position: relative;
-            text-align: center;
-        }
-
-        .stat::after {
-            content: '';
-            position: absolute;
-            right: -2rem;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 1px;
-            height: 40px;
-            background: linear-gradient(180deg, transparent, rgba(200, 20, 20, 0.3), transparent);
-        }
-
-        .stat:last-child::after {
-            display: none;
-        }
-
-        .stat-number {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: clamp(2rem, 4vw, 3rem);
-            font-weight: 700;
-            color: #e01a1a;
-            line-height: 1;
-            margin-bottom: 0.4rem;
-            text-shadow: 0 0 30px rgba(200, 20, 20, 0.4);
-        }
-
-        .stat-label {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.65rem;
-            letter-spacing: 0.25em;
-            text-transform: uppercase;
-            color: #555;
-        }
-
-
-        .email {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: clamp(0.85rem, 1.5vw, 1.1rem);
-            color: #c81414;
-            text-decoration: none;
-            letter-spacing: 0.05em;
-            padding: 0.8rem 0;
-            position: relative;
-            opacity: 0;
-            animation: fadeUp 1s ease forwards 0.9s;
-            transition: all 0.3s ease;
-        }
-
-        .email::before {
-            content: '> ';
-            opacity: 0.4;
-        }
-
-        .email::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 0;
-            height: 1px;
-            background: #c81414;
-            transition: width 0.4s ease;
-        }
-
-        .email:hover {
-            color: #ff2020;
-            text-shadow: 0 0 20px rgba(200, 20, 20, 0.5);
-        }
-
-        .email:hover::after {
-            width: 100%;
-        }
-
-        @keyframes fadeUp {
+        /* ── Blur fade entrance (MagicUI) ── */
+        @keyframes blur-fade-up {
             from {
                 opacity: 0;
-                transform: translateY(30px);
+                filter: blur(8px);
+                transform: translateY(16px);
             }
             to {
                 opacity: 1;
+                filter: blur(0);
                 transform: translateY(0);
             }
         }
 
-
-        /* Bottom accent */
-        .bottom-line {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent 0%, #c81414 50%, transparent 100%);
-            z-index: 10;
+        .blur-fade {
+            opacity: 0;
+            animation: blur-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
-        /* Corner accents */
-        .corner {
-            position: fixed;
-            width: 30px;
-            height: 30px;
-            z-index: 10;
-            opacity: 0.3;
+        .blur-fade:nth-child(1) { animation-delay: 0.1s; }
+        .blur-fade:nth-child(2) { animation-delay: 0.3s; }
+        .blur-fade:nth-child(3) { animation-delay: 0.5s; }
+        .blur-fade:nth-child(4) { animation-delay: 0.7s; }
+
+        .name {
+            font-size: clamp(2.75rem, 7vw, 5.5rem);
+            font-weight: 600;
+            letter-spacing: -0.03em;
+            line-height: 1.05;
+            background: linear-gradient(180deg, #fafafa 30%, rgba(250, 250, 250, 0.55) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .corner--tl {
-            top: 20px;
-            left: 20px;
-            border-top: 1px solid #c81414;
-            border-left: 1px solid #c81414;
+        /* ── Stats with number tickers (MagicUI) ── */
+        .stats {
+            display: flex;
+            align-items: stretch;
+            gap: 0;
         }
 
-        .corner--tr {
-            top: 20px;
-            right: 20px;
-            border-top: 1px solid #c81414;
-            border-right: 1px solid #c81414;
+        .stat {
+            padding: 0 3rem;
+            text-align: center;
         }
 
-        .corner--bl {
-            bottom: 20px;
-            left: 20px;
-            border-bottom: 1px solid #c81414;
-            border-left: 1px solid #c81414;
+        .stat + .stat {
+            border-left: 1px solid var(--border);
         }
 
-        .corner--br {
-            bottom: 20px;
-            right: 20px;
-            border-bottom: 1px solid #c81414;
-            border-right: 1px solid #c81414;
+        .stat-number {
+            font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            font-variant-numeric: tabular-nums;
+            line-height: 1.2;
+            margin-bottom: 0.35rem;
         }
 
-        /* Mobile name - hidden on desktop */
-        .name-mobile {
-            display: none;
+        .stat-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted-2);
         }
 
-        /* Mobile */
-        @media (max-width: 768px) {
+        /* ── Shimmer button (MagicUI) ── */
+        .shimmer-button {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            background: #000;
+            color: var(--fg);
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-decoration: none;
+            padding: 0.9rem 2.25rem;
+            white-space: nowrap;
+            box-shadow: inset 0 -8px 10px rgba(255, 255, 255, 0.12);
+            transition: box-shadow 0.3s ease, transform 0.3s ease;
+        }
+
+        .shimmer-button:hover {
+            box-shadow: inset 0 -6px 10px rgba(255, 255, 255, 0.25);
+        }
+
+        .shimmer-button:active {
+            transform: translateY(1px);
+        }
+
+        .shimmer-button::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 300%;
+            aspect-ratio: 1;
+            background: conic-gradient(from 225deg, transparent 0deg, #ffffff 90deg, transparent 90.5deg);
+            animation: shimmer-spin 3s linear infinite;
+            filter: blur(2px);
+        }
+
+        @keyframes shimmer-spin {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .shimmer-button::after {
+            content: '';
+            position: absolute;
+            inset: 1px;
+            border-radius: inherit;
+            background: #000;
+        }
+
+        .shimmer-button span {
+            position: relative;
+            z-index: 1;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .blur-fade {
+                animation-duration: 0.01ms;
+                animation-delay: 0s;
+            }
+            .shimmer-button::before {
+                animation: none;
+            }
+        }
+
+        /* ── Mobile ── */
+        @media (max-width: 640px) {
             .hero {
-                padding: 2rem 1.5rem;
-                justify-content: center;
-                gap: 0;
-            }
-
-            .name-container {
-                display: none;
-            }
-
-            .name-mobile {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                font-family: 'Inter', sans-serif;
-                font-weight: 900;
-                text-transform: uppercase;
-                letter-spacing: -0.02em;
-                line-height: 0.95;
-                margin-bottom: 2.5rem;
-                opacity: 0;
-                animation: fadeIn 1s ease forwards 0.3s;
-            }
-
-            .name-mobile-first {
-                font-size: 4.5rem;
-                background: linear-gradient(180deg, #ffffff 0%, #b0b0b0 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
-            }
-
-            .name-mobile-last {
-                font-size: 2.6rem;
-                background: linear-gradient(180deg, #d0d0d0 0%, #808080 100%);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
+                gap: 2.25rem;
             }
 
             .stats {
-                flex-direction: row;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 0;
-                width: 100%;
-                margin-bottom: 2.5rem;
+                flex-direction: column;
+                gap: 1.75rem;
             }
 
             .stat {
-                flex: 1 1 33%;
-                min-width: 0;
-                padding: 1rem 0.5rem;
+                padding: 0;
             }
 
-            .stat::after {
-                right: 0;
-                height: 30px;
-            }
-
-            .stat:last-child::after {
-                display: none;
+            .stat + .stat {
+                border-left: none;
             }
 
             .stat-number {
-                font-size: 1.6rem;
-                text-shadow: 0 0 20px rgba(200, 20, 20, 0.3);
-            }
-
-            .stat-label {
-                font-size: 0.5rem;
-                letter-spacing: 0.15em;
-            }
-
-            .email {
-                font-size: 0.85rem;
-            }
-
-            #grid {
-                display: none;
-            }
-
-            .cursor-glow {
-                display: none;
-            }
-
-            #matrix {
-                opacity: 1 !important;
-            }
-
-            .corner {
-                width: 20px;
-                height: 20px;
-            }
-
-            .corner--tl { top: 12px; left: 12px; }
-            .corner--tr { top: 12px; right: 12px; }
-            .corner--bl { bottom: 12px; left: 12px; }
-            .corner--br { bottom: 12px; right: 12px; }
-        }
-
-        @media (max-width: 380px) {
-            .name-mobile-first {
-                font-size: 3.8rem;
-            }
-
-            .name-mobile-last {
-                font-size: 2.2rem;
-            }
-
-            .stat-number {
-                font-size: 1.3rem;
-            }
-
-            .stat-label {
-                font-size: 0.45rem;
+                font-size: 2rem;
             }
         }
     </style>
 </head>
 <body>
-    <canvas id="matrix"></canvas>
-    <canvas id="grid"></canvas>
-    <div class="cursor-glow" id="cursorGlow"></div>
-    <div class="scanlines"></div>
-
-    <div class="corner corner--tl"></div>
-    <div class="corner corner--tr"></div>
-    <div class="corner corner--bl"></div>
-    <div class="corner corner--br"></div>
+    <canvas id="flickering-grid"></canvas>
 
     <section class="hero">
-        <div class="name-container" id="nameContainer">
-            <span class="name-hidden" id="nameHidden">CHRIS MIGLIORANZI</span>
-            <canvas id="nameCanvas"></canvas>
-        </div>
+        <h1 class="name blur-fade">Chris Miglioranzi</h1>
 
-        <h1 class="name-mobile">
-            <span class="name-mobile-first">CHRIS</span>
-            <span class="name-mobile-last">MIGLIORANZI</span>
-        </h1>
-
-        <div class="stats">
+        <div class="stats blur-fade">
             <div class="stat">
-                <div class="stat-number" data-target="100" data-suffix="B+">0</div>
+                <div class="stat-number"><span class="ticker" data-target="100">0</span>B+</div>
                 <div class="stat-label">Views Generated</div>
             </div>
             <div class="stat">
-                <div class="stat-number" data-target="200" data-suffix="+">0</div>
+                <div class="stat-number"><span class="ticker" data-target="200">0</span>+</div>
                 <div class="stat-label">Brands Voiced</div>
             </div>
             <div class="stat">
-                <div class="stat-number" data-target="50" data-suffix="M+">0</div>
+                <div class="stat-number">$<span class="ticker" data-target="50">0</span>M+</div>
                 <div class="stat-label">Revenue Driven</div>
             </div>
         </div>
 
-        <a href="mailto:Chris@gmail.com" class="email">Chris@gmail.com</a>
+        <div class="blur-fade">
+            <a href="mailto:Chris@gmail.com" class="shimmer-button"><span>Chris@gmail.com</span></a>
+        </div>
     </section>
 
-    <div class="bottom-line"></div>
-
     <script>
-        const isMobile = window.innerWidth <= 768;
-        let mouseX = -1000;
-        let mouseY = -1000;
+        // ── Flickering grid background (adapted from MagicUI FlickeringGrid) ──
+        (() => {
+            const canvas = document.getElementById('flickering-grid');
+            const ctx = canvas.getContext('2d');
+            const squareSize = 3;
+            const gridGap = 8;
+            const flickerChance = 0.2;
+            const maxOpacity = 0.18;
+            const color = '161, 161, 170';
+            const dpr = window.devicePixelRatio || 1;
 
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            const glow = document.getElementById('cursorGlow');
-            glow.style.left = mouseX + 'px';
-            glow.style.top = mouseY + 'px';
-        });
+            let cols, rows, squares;
 
-        document.addEventListener('mouseleave', () => {
-            mouseX = -1000;
-            mouseY = -1000;
-        });
-
-
-        // ─── MATRIX RAIN ───
-        const matrixCanvas = document.getElementById('matrix');
-        const mCtx = matrixCanvas.getContext('2d');
-
-        function resizeMatrix() {
-            matrixCanvas.width = window.innerWidth;
-            matrixCanvas.height = window.innerHeight;
-        }
-        resizeMatrix();
-
-        const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEF';
-        const fontSize = 14;
-        let mColumns = Math.floor(matrixCanvas.width / fontSize);
-        let drops = [];
-        let speeds = [];
-        let brightness = [];
-
-        function initDrops() {
-            mColumns = Math.floor(matrixCanvas.width / fontSize);
-            drops = [];
-            speeds = [];
-            brightness = [];
-            for (let i = 0; i < mColumns; i++) {
-                drops.push(Math.random() * matrixCanvas.height / fontSize);
-                speeds.push(0.3 + Math.random() * 0.8);
-                brightness.push(0.3 + Math.random() * 0.7);
+            function setup() {
+                const w = window.innerWidth;
+                const h = window.innerHeight;
+                canvas.width = w * dpr;
+                canvas.height = h * dpr;
+                canvas.style.width = w + 'px';
+                canvas.style.height = h + 'px';
+                cols = Math.ceil(w / (squareSize + gridGap));
+                rows = Math.ceil(h / (squareSize + gridGap));
+                squares = new Float32Array(cols * rows);
+                for (let i = 0; i < squares.length; i++) {
+                    squares[i] = Math.random() * maxOpacity;
+                }
             }
-        }
-        initDrops();
 
-        function drawMatrix() {
-            mCtx.fillStyle = isMobile ? 'rgba(5, 5, 5, 0.06)' : 'rgba(5, 5, 5, 0.08)';
-            mCtx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+            let lastTime = 0;
+            function animate(time) {
+                const deltaTime = Math.min((time - lastTime) / 1000, 0.1);
+                lastTime = time;
 
-            for (let i = 0; i < drops.length; i++) {
-                const char = chars[Math.floor(Math.random() * chars.length)];
-                const alpha = brightness[i] * (isMobile ? 0.35 : 0.12);
-                const y = drops[i] * fontSize;
-
-                mCtx.fillStyle = `rgba(200, 20, 20, ${alpha * 2.5})`;
-                mCtx.font = `${fontSize}px monospace`;
-                mCtx.fillText(char, i * fontSize, y);
-
-                if (isMobile) {
-                    for (let t = 1; t < 6; t++) {
-                        const trailChar = chars[Math.floor(Math.random() * chars.length)];
-                        const trailAlpha = alpha * (1 - t * 0.18);
-                        if (trailAlpha > 0) {
-                            mCtx.fillStyle = `rgba(200, 20, 20, ${trailAlpha})`;
-                            mCtx.fillText(trailChar, i * fontSize, y - t * fontSize);
-                        }
+                for (let i = 0; i < squares.length; i++) {
+                    if (Math.random() < flickerChance * deltaTime) {
+                        squares[i] = Math.random() * maxOpacity;
                     }
                 }
 
-                drops[i] += speeds[i];
-                if (drops[i] * fontSize > matrixCanvas.height && Math.random() > 0.975) {
-                    drops[i] = 0;
-                    brightness[i] = 0.3 + Math.random() * 0.7;
-                }
-            }
-        }
-
-        setInterval(drawMatrix, 45);
-
-
-        // ─── INTERACTIVE GRID ───
-        const gridCanvas = document.getElementById('grid');
-        const gCtx = gridCanvas.getContext('2d');
-
-        const CELL = 50;
-        let gridCells = [];
-
-        function resizeGrid() {
-            gridCanvas.width = window.innerWidth;
-            gridCanvas.height = window.innerHeight;
-            buildGrid();
-        }
-
-        function buildGrid() {
-            gridCells = [];
-            const cols = Math.ceil(gridCanvas.width / CELL) + 1;
-            const rows = Math.ceil(gridCanvas.height / CELL) + 1;
-            for (let r = 0; r < rows; r++) {
-                for (let c = 0; c < cols; c++) {
-                    gridCells.push({
-                        x: c * CELL, y: r * CELL,
-                        glow: 0, targetGlow: 0,
-                        pulse: Math.random() * Math.PI * 2
-                    });
-                }
-            }
-        }
-
-        resizeGrid();
-
-        function drawGrid() {
-            gCtx.clearRect(0, 0, gridCanvas.width, gridCanvas.height);
-            for (const cell of gridCells) {
-                const cx = cell.x + CELL / 2;
-                const cy = cell.y + CELL / 2;
-                const dx = mouseX - cx;
-                const dy = mouseY - cy;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                cell.targetGlow = dist < 200 ? (1 - dist / 200) : 0;
-                cell.glow += (cell.targetGlow - cell.glow) * 0.08;
-                cell.pulse += 0.02;
-                const ambient = 0.015 + Math.sin(cell.pulse + cell.x * 0.01 + cell.y * 0.01) * 0.008;
-                const intensity = Math.max(cell.glow, ambient);
-                if (intensity > 0.01) {
-                    gCtx.strokeStyle = `rgba(200, 20, 20, ${intensity * 0.15})`;
-                    gCtx.lineWidth = 0.5;
-                    gCtx.strokeRect(cell.x, cell.y, CELL, CELL);
-                    if (intensity > 0.1) {
-                        gCtx.fillStyle = `rgba(200, 20, 20, ${intensity * 0.02})`;
-                        gCtx.fillRect(cell.x, cell.y, CELL, CELL);
-                    }
-                    if (intensity > 0.5) {
-                        gCtx.fillStyle = `rgba(255, 40, 40, ${(intensity - 0.5) * 0.4})`;
-                        const d = 1.5;
-                        gCtx.fillRect(cell.x-d/2, cell.y-d/2, d, d);
-                        gCtx.fillRect(cell.x+CELL-d/2, cell.y-d/2, d, d);
-                        gCtx.fillRect(cell.x-d/2, cell.y+CELL-d/2, d, d);
-                        gCtx.fillRect(cell.x+CELL-d/2, cell.y+CELL-d/2, d, d);
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (let i = 0; i < cols; i++) {
+                    for (let j = 0; j < rows; j++) {
+                        ctx.fillStyle = `rgba(${color}, ${squares[i * rows + j]})`;
+                        ctx.fillRect(
+                            i * (squareSize + gridGap) * dpr,
+                            j * (squareSize + gridGap) * dpr,
+                            squareSize * dpr,
+                            squareSize * dpr
+                        );
                     }
                 }
+                requestAnimationFrame(animate);
             }
-            requestAnimationFrame(drawGrid);
-        }
 
-        if (!isMobile) drawGrid();
+            setup();
+            window.addEventListener('resize', setup);
+            requestAnimationFrame(animate);
+        })();
 
+        // ── Number ticker (adapted from MagicUI NumberTicker) ──
+        (() => {
+            const tickers = document.querySelectorAll('.ticker');
+            const formatter = new Intl.NumberFormat('en-US');
+            let started = false;
 
-        // ─── WATER RIPPLE NAME ───
-        const nameCanvas = document.getElementById('nameCanvas');
-        const nCtx = nameCanvas.getContext('2d');
-        const nameContainer = document.getElementById('nameContainer');
-        const nameHidden = document.getElementById('nameHidden');
-        const dpr = window.devicePixelRatio || 1;
+            function springTo(el, target) {
+                // Critically-damped-ish spring matching MagicUI's damping: 60, stiffness: 100
+                let value = 0;
+                let velocity = 0;
+                const stiffness = 100;
+                const damping = 26;
+                let last = performance.now();
 
-        let rippleW, rippleH, buf1, buf2, textImageData, nameW, nameH;
-        let lastDropTime = 0;
-
-        function getTextStyle() {
-            const cs = getComputedStyle(nameHidden);
-            return {
-                fontSize: cs.fontSize,
-                fontWeight: cs.fontWeight,
-                fontFamily: cs.fontFamily,
-                letterSpacing: cs.letterSpacing
-            };
-        }
-
-        function initNameCanvas() {
-            const style = getTextStyle();
-            const pad = 30;
-            const maxW = window.innerWidth - 40;
-
-            nCtx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-            const metrics = nCtx.measureText('CHRIS MIGLIORANZI');
-
-            nameW = Math.min(Math.ceil(metrics.width) + pad * 2, maxW);
-            nameH = Math.ceil(parseFloat(style.fontSize) * 1.3) + pad * 2;
-
-            nameCanvas.width = nameW * dpr;
-            nameCanvas.height = nameH * dpr;
-            nameCanvas.style.width = nameW + 'px';
-            nameCanvas.style.height = nameH + 'px';
-            nCtx.scale(dpr, dpr);
-
-            const rippleScale = 3;
-            rippleW = Math.ceil(nameW / rippleScale);
-            rippleH = Math.ceil(nameH / rippleScale);
-            buf1 = new Float32Array(rippleW * rippleH);
-            buf2 = new Float32Array(rippleW * rippleH);
-
-            renderStaticText();
-        }
-
-        function renderStaticText() {
-            const style = getTextStyle();
-            const offscreen = document.createElement('canvas');
-            offscreen.width = nameW * dpr;
-            offscreen.height = nameH * dpr;
-            const oCtx = offscreen.getContext('2d');
-            oCtx.scale(dpr, dpr);
-
-            const grad = oCtx.createLinearGradient(0, 0, 0, nameH);
-            grad.addColorStop(0, '#ffffff');
-            grad.addColorStop(1, '#a0a0a0');
-
-            oCtx.font = `${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-            oCtx.fillStyle = grad;
-            oCtx.textAlign = 'center';
-            oCtx.textBaseline = 'middle';
-            oCtx.fillText('CHRIS MIGLIORANZI', nameW / 2, nameH / 2);
-
-            textImageData = oCtx.getImageData(0, 0, nameW * dpr, nameH * dpr);
-        }
-
-        function dropRipple(x, y, strength) {
-            const rx = Math.floor(x / nameW * rippleW);
-            const ry = Math.floor(y / nameH * rippleH);
-            const radius = 6;
-            for (let dy = -radius; dy <= radius; dy++) {
-                for (let dx = -radius; dx <= radius; dx++) {
-                    const px = rx + dx;
-                    const py = ry + dy;
-                    if (px >= 0 && px < rippleW && py >= 0 && py < rippleH) {
-                        const dist = Math.sqrt(dx * dx + dy * dy);
-                        if (dist < radius) {
-                            const falloff = Math.cos((dist / radius) * Math.PI * 0.5);
-                            buf1[py * rippleW + px] += strength * falloff * falloff;
-                        }
+                function step(now) {
+                    const dt = Math.min((now - last) / 1000, 0.064);
+                    last = now;
+                    const accel = stiffness * (target - value) - damping * velocity;
+                    velocity += accel * dt;
+                    value += velocity * dt;
+                    if (Math.abs(target - value) < 0.5 && Math.abs(velocity) < 0.5) {
+                        el.textContent = formatter.format(target);
+                        return;
                     }
+                    el.textContent = formatter.format(Math.round(value));
+                    requestAnimationFrame(step);
                 }
-            }
-        }
-
-        function stepRipple() {
-            const damping = 0.995;
-            for (let y = 1; y < rippleH - 1; y++) {
-                for (let x = 1; x < rippleW - 1; x++) {
-                    const i = y * rippleW + x;
-                    buf2[i] = (
-                        buf1[i - 1] + buf1[i + 1] +
-                        buf1[i - rippleW] + buf1[i + rippleW]
-                    ) / 2 - buf2[i];
-                    buf2[i] *= damping;
-                }
-            }
-            const temp = buf1;
-            buf1 = buf2;
-            buf2 = temp;
-        }
-
-        function renderRipple() {
-            if (!textImageData) return;
-            const src = textImageData.data;
-            const w = nameW * dpr;
-            const h = nameH * dpr;
-            const out = nCtx.createImageData(w, h);
-            const dst = out.data;
-            const sx = rippleW / w;
-            const sy = rippleH / h;
-
-            for (let y = 0; y < h; y++) {
-                for (let x = 0; x < w; x++) {
-                    const rxi = Math.floor(x * sx);
-                    const ryi = Math.floor(y * sy);
-
-                    let dispX = 0, dispY = 0;
-                    if (rxi > 0 && rxi < rippleW - 1 && ryi > 0 && ryi < rippleH - 1) {
-                        const ri = ryi * rippleW + rxi;
-                        dispX = (buf1[ri - 1] - buf1[ri + 1]) * 1.5;
-                        dispY = (buf1[ri - rippleW] - buf1[ri + rippleW]) * 1.5;
-                    }
-
-                    let tx = Math.round(x + dispX);
-                    let ty = Math.round(y + dispY);
-                    tx = Math.max(0, Math.min(w - 1, tx));
-                    ty = Math.max(0, Math.min(h - 1, ty));
-
-                    const si = (ty * w + tx) * 4;
-                    const di = (y * w + x) * 4;
-
-                    const ri2 = ryi * rippleW + rxi;
-                    const wave = (rxi > 0 && rxi < rippleW - 1) ? buf1[ri2] : 0;
-                    const hl = wave * 0.3;
-
-                    dst[di]     = Math.max(0, Math.min(255, src[si] + hl));
-                    dst[di + 1] = Math.max(0, Math.min(255, src[si+1] + hl * 0.4));
-                    dst[di + 2] = Math.max(0, Math.min(255, src[si+2] + hl * 0.4));
-                    dst[di + 3] = src[si + 3];
-                }
+                requestAnimationFrame(step);
             }
 
-            nCtx.putImageData(out, 0, 0);
-        }
-
-        nameContainer.addEventListener('mousemove', (e) => {
-            const rect = nameCanvas.getBoundingClientRect();
-            const nx = e.clientX - rect.left;
-            const ny = e.clientY - rect.top;
-
-            const now = Date.now();
-            if (now - lastDropTime > 60) {
-                dropRipple(nx, ny, 6);
-                lastDropTime = now;
+            function start() {
+                if (started) return;
+                started = true;
+                tickers.forEach(el => springTo(el, parseInt(el.dataset.target, 10)));
             }
-        });
 
-        nameContainer.addEventListener('click', (e) => {
-            const rect = nameCanvas.getBoundingClientRect();
-            dropRipple(e.clientX - rect.left, e.clientY - rect.top, 20);
-        });
-
-        function animateName() {
-            stepRipple();
-            nCtx.save();
-            nCtx.setTransform(1, 0, 0, 1, 0, 0);
-            nCtx.clearRect(0, 0, nameCanvas.width, nameCanvas.height);
-            nCtx.restore();
-            renderRipple();
-            requestAnimationFrame(animateName);
-        }
-
-        document.fonts.ready.then(() => {
-            initNameCanvas();
-            animateName();
-        });
-
-
-        // ─── STAT COUNTER ANIMATION ───
-        const statNumbers = document.querySelectorAll('.stat-number');
-        let counted = false;
-
-        function countUp() {
-            if (counted) return;
-            counted = true;
-            statNumbers.forEach(el => {
-                const target = parseInt(el.dataset.target);
-                const suffix = el.dataset.suffix || '';
-                const duration = 2000;
-                const start = performance.now();
-                function update(now) {
-                    const elapsed = now - start;
-                    const progress = Math.min(elapsed / duration, 1);
-                    const eased = 1 - Math.pow(1 - progress, 4);
-                    el.textContent = Math.floor(eased * target) + suffix;
-                    if (progress < 1) requestAnimationFrame(update);
-                    else el.textContent = target + suffix;
-                }
-                requestAnimationFrame(update);
-            });
-        }
-
-        const observer = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting) countUp();
-        }, { threshold: 0.5 });
-        const statsEl = document.querySelector('.stats');
-        if (statsEl) observer.observe(statsEl);
-
-
-        // ─── RESIZE ───
-        window.addEventListener('resize', () => {
-            resizeMatrix();
-            initDrops();
-            if (!isMobile) resizeGrid();
-            initNameCanvas();
-        });
+            const observer = new IntersectionObserver(entries => {
+                if (entries[0].isIntersecting) start();
+            }, { threshold: 0.5 });
+            observer.observe(document.querySelector('.stats'));
+        })();
     </script>
 </body>
 </html>
