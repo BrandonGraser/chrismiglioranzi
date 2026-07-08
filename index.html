@@ -46,6 +46,13 @@
             mask-image: radial-gradient(ellipse 80% 72% at 50% 45%, transparent 28%, black 92%);
         }
 
+        /* the SVG url() filter is too costly on mobile GPUs — keep only the cheap blur */
+        @media (max-width: 640px) {
+            #matrix-rain {
+                filter: blur(0.4px);
+            }
+        }
+
         .hero {
             position: relative;
             z-index: 1;
@@ -298,16 +305,18 @@
             const canvas = document.getElementById('matrix-rain');
             const ctx = canvas.getContext('2d');
             const digits = '0123456789';
-            const fontSize = 14;
             const fadeMs = 900;      // time for a passed streak to fade out
             const minBright = 0.04;  // below this a cell is fully cleared (no ghosting)
             const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-            let width, height, cols, rows, bright, glyph, heads, intervals, nextTick;
+            let width, height, fontSize, minFrameMs, cols, rows, bright, glyph, heads, intervals, nextTick;
 
             function setup() {
                 width = window.innerWidth;
                 height = window.innerHeight;
+                const mobile = width <= 640;
+                fontSize = mobile ? 18 : 14;    // fewer, larger cells on mobile
+                minFrameMs = mobile ? 32 : 0;   // cap mobile to ~30fps
                 canvas.width = width;
                 canvas.height = height;
                 cols = Math.ceil(width / fontSize);
@@ -326,6 +335,8 @@
 
             let lastFrame = 0;
             function loop(now) {
+                requestAnimationFrame(loop);
+                if (lastFrame && now - lastFrame < minFrameMs) return;
                 const dt = lastFrame ? now - lastFrame : 16;
                 lastFrame = now;
 
@@ -364,7 +375,6 @@
                         ctx.fillText(digits[glyph[j * cols + i]], i * fontSize, j * fontSize);
                     }
                 }
-                requestAnimationFrame(loop);
             }
 
             setup();
