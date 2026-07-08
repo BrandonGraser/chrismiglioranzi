@@ -32,16 +32,16 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* ── Flickering grid background (MagicUI) ── */
-        #flickering-grid {
+        /* ── Matrix rain background ── */
+        #matrix-rain {
             position: fixed;
             inset: 0;
             width: 100%;
             height: 100%;
             z-index: 0;
             pointer-events: none;
-            -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, black 30%, transparent 100%);
-            mask-image: radial-gradient(ellipse 80% 70% at 50% 45%, black 30%, transparent 100%);
+            -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 45%, transparent 20%, black 90%);
+            mask-image: radial-gradient(ellipse 75% 65% at 50% 45%, transparent 20%, black 90%);
         }
 
         .hero {
@@ -250,7 +250,7 @@
     </style>
 </head>
 <body>
-    <canvas id="flickering-grid"></canvas>
+    <canvas id="matrix-rain"></canvas>
 
     <section class="hero">
         <h1 class="name blur-fade"><span class="name-first">Chris</span> <span class="name-last">Miglioranzi</span></h1>
@@ -285,63 +285,72 @@
     </section>
 
     <script>
-        // ── Flickering grid background (adapted from MagicUI FlickeringGrid) ──
+        // ── Matrix rain background (digits, subtle, muted whiteish) ──
         (() => {
-            const canvas = document.getElementById('flickering-grid');
+            const canvas = document.getElementById('matrix-rain');
             const ctx = canvas.getContext('2d');
-            const squareSize = 3;
-            const gridGap = 8;
-            const flickerChance = 0.2;
-            const maxOpacity = 0.18;
-            const color = '161, 161, 170';
-            const dpr = window.devicePixelRatio || 1;
+            const color = '180, 180, 190';        // muted whiteish-gray
+            const fontSize = 15;
+            const digits = '0123456789';
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-            let cols, rows, squares;
+            let width, height, columns, drops, speeds;
 
             function setup() {
-                const w = window.innerWidth;
-                const h = window.innerHeight;
-                canvas.width = w * dpr;
-                canvas.height = h * dpr;
-                canvas.style.width = w + 'px';
-                canvas.style.height = h + 'px';
-                cols = Math.ceil(w / (squareSize + gridGap));
-                rows = Math.ceil(h / (squareSize + gridGap));
-                squares = new Float32Array(cols * rows);
-                for (let i = 0; i < squares.length; i++) {
-                    squares[i] = Math.random() * maxOpacity;
+                width = window.innerWidth;
+                height = window.innerHeight;
+                canvas.width = width;
+                canvas.height = height;
+                columns = Math.floor(width / fontSize);
+                drops = [];
+                speeds = [];
+                for (let i = 0; i < columns; i++) {
+                    drops[i] = Math.random() * -height / fontSize;
+                    speeds[i] = 0.25 + Math.random() * 0.4;
                 }
             }
 
-            let lastTime = 0;
-            function animate(time) {
-                const deltaTime = Math.min((time - lastTime) / 1000, 0.1);
-                lastTime = time;
+            function draw() {
+                // translucent bg pass leaves fading trails
+                ctx.fillStyle = 'rgba(9, 9, 11, 0.12)';
+                ctx.fillRect(0, 0, width, height);
+                ctx.font = `${fontSize}px 'JetBrains Mono', ui-monospace, monospace`;
 
-                for (let i = 0; i < squares.length; i++) {
-                    if (Math.random() < flickerChance * deltaTime) {
-                        squares[i] = Math.random() * maxOpacity;
+                for (let i = 0; i < columns; i++) {
+                    const x = i * fontSize;
+                    const y = drops[i] * fontSize;
+                    const char = digits[Math.floor(Math.random() * digits.length)];
+
+                    // brighter leading glyph, faint trail
+                    ctx.fillStyle = `rgba(${color}, 0.16)`;
+                    ctx.fillText(char, x, y);
+                    ctx.fillStyle = `rgba(230, 230, 235, 0.28)`;
+                    ctx.fillText(char, x, y);
+
+                    drops[i] += speeds[i];
+                    if (y > height && Math.random() > 0.98) {
+                        drops[i] = Math.random() * -20;
                     }
                 }
-
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                for (let i = 0; i < cols; i++) {
-                    for (let j = 0; j < rows; j++) {
-                        ctx.fillStyle = `rgba(${color}, ${squares[i * rows + j]})`;
-                        ctx.fillRect(
-                            i * (squareSize + gridGap) * dpr,
-                            j * (squareSize + gridGap) * dpr,
-                            squareSize * dpr,
-                            squareSize * dpr
-                        );
-                    }
-                }
-                requestAnimationFrame(animate);
+                requestAnimationFrame(draw);
             }
 
             setup();
             window.addEventListener('resize', setup);
-            requestAnimationFrame(animate);
+            if (reduceMotion) {
+                // single faint static pass, no animation
+                ctx.font = `${fontSize}px 'JetBrains Mono', ui-monospace, monospace`;
+                ctx.fillStyle = `rgba(${color}, 0.1)`;
+                for (let i = 0; i < columns; i++) {
+                    for (let j = 0; j < Math.ceil(height / fontSize); j++) {
+                        if (Math.random() > 0.85) {
+                            ctx.fillText(digits[Math.floor(Math.random() * digits.length)], i * fontSize, j * fontSize);
+                        }
+                    }
+                }
+            } else {
+                requestAnimationFrame(draw);
+            }
         })();
 
         // ── Number ticker (adapted from MagicUI NumberTicker) ──
