@@ -285,30 +285,33 @@
     </section>
 
     <script>
-        // ── Matrix rain background (digits, white, dense classic style) ──
+        // ── Matrix rain background (digits, white, per-cell brightness grid) ──
         (() => {
             const canvas = document.getElementById('matrix-rain');
             const ctx = canvas.getContext('2d');
             const digits = '0123456789';
             const fontSize = 14;
+            const fadeMs = 900;      // time for a passed streak to fade out
+            const minBright = 0.04;  // below this a cell is fully cleared (no ghosting)
             const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-            let width, height, columns, drops, intervals, nextTick;
+            let width, height, cols, rows, bright, glyph, heads, intervals, nextTick;
 
             function setup() {
                 width = window.innerWidth;
                 height = window.innerHeight;
                 canvas.width = width;
                 canvas.height = height;
-                columns = Math.ceil(width / fontSize);
-                drops = [];
+                cols = Math.ceil(width / fontSize);
+                rows = Math.ceil(height / fontSize) + 1;
+                bright = new Float32Array(cols * rows);   // per-cell brightness 0..1
+                glyph = new Uint8Array(cols * rows);      // per-cell digit, held while it fades
+                heads = [];
                 intervals = [];
                 nextTick = [];
-                for (let i = 0; i < columns; i++) {
-                    // stagger start positions above the top for varied streaks
-                    drops[i] = Math.floor(Math.random() * -height / fontSize);
-                    // each column falls at its own speed (ms per row)
-                    intervals[i] = 45 + Math.random() * 70;
+                for (let i = 0; i < cols; i++) {
+                    heads[i] = Math.floor(Math.random() * -rows);   // start above the top
+                    intervals[i] = 45 + Math.random() * 70;         // each column its own speed
                     nextTick[i] = 0;
                 }
             }
@@ -318,24 +321,39 @@
                 const dt = lastFrame ? now - lastFrame : 16;
                 lastFrame = now;
 
-                // time-based fade keeps trail length bounded across speeds
-                ctx.fillStyle = `rgba(9, 9, 11, ${Math.min(0.20 * dt / 80, 0.5)})`;
-                ctx.fillRect(0, 0, width, height);
-                ctx.font = `${fontSize}px 'JetBrains Mono', ui-monospace, monospace`;
-                ctx.textBaseline = 'top';
-                ctx.fillStyle = 'rgba(240, 240, 245, 0.82)';
+                // decay every cell toward zero, snapping small values to a hard 0
+                const decay = Math.pow(minBright, dt / fadeMs);
+                for (let k = 0; k < bright.length; k++) {
+                    if (bright[k] === 0) continue;
+                    bright[k] *= decay;
+                    if (bright[k] < minBright) bright[k] = 0;
+                }
 
-                for (let i = 0; i < columns; i++) {
+                // advance each column's head at its own pace, lighting a fresh cell
+                for (let i = 0; i < cols; i++) {
                     if (now < nextTick[i]) continue;
                     nextTick[i] = now + intervals[i];
+                    heads[i]++;
+                    if (heads[i] >= rows) {
+                        if (Math.random() > 0.5) heads[i] = 0; else continue;
+                    }
+                    if (heads[i] >= 0) {
+                        const k = heads[i] * cols + i;
+                        bright[k] = 1;
+                        glyph[k] = Math.floor(Math.random() * 10);
+                    }
+                }
 
-                    const x = i * fontSize;
-                    const y = drops[i] * fontSize;
-                    ctx.fillText(digits[Math.floor(Math.random() * digits.length)], x, y);
-
-                    drops[i]++;
-                    if (y > height && Math.random() > 0.975) {
-                        drops[i] = Math.floor(Math.random() * -20);
+                // redraw from scratch — overwrite, never accumulate
+                ctx.clearRect(0, 0, width, height);
+                ctx.font = `${fontSize}px 'JetBrains Mono', ui-monospace, monospace`;
+                ctx.textBaseline = 'top';
+                for (let j = 0; j < rows; j++) {
+                    for (let i = 0; i < cols; i++) {
+                        const v = bright[j * cols + i];
+                        if (v === 0) continue;
+                        ctx.fillStyle = `rgba(240, 240, 245, ${(v * 0.85).toFixed(3)})`;
+                        ctx.fillText(digits[glyph[j * cols + i]], i * fontSize, j * fontSize);
                     }
                 }
                 requestAnimationFrame(loop);
@@ -348,10 +366,10 @@
                 ctx.font = `${fontSize}px 'JetBrains Mono', ui-monospace, monospace`;
                 ctx.textBaseline = 'top';
                 ctx.fillStyle = 'rgba(220, 220, 228, 0.18)';
-                for (let i = 0; i < columns; i++) {
-                    for (let j = 0; j < Math.ceil(height / fontSize); j++) {
+                for (let i = 0; i < cols; i++) {
+                    for (let j = 0; j < rows; j++) {
                         if (Math.random() > 0.55) {
-                            ctx.fillText(digits[Math.floor(Math.random() * digits.length)], i * fontSize, j * fontSize);
+                            ctx.fillText(digits[Math.floor(Math.random() * 10)], i * fontSize, j * fontSize);
                         }
                     }
                 }
