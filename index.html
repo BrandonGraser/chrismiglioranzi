@@ -92,6 +92,20 @@
             -webkit-text-fill-color: transparent;
         }
 
+        .bio {
+            max-width: 40rem;
+            font-size: clamp(0.95rem, 1.4vw, 1.075rem);
+            font-weight: 400;
+            line-height: 1.75;
+            color: var(--muted);
+            margin-top: -1rem;
+        }
+
+        .bio strong {
+            font-weight: 500;
+            color: var(--fg);
+        }
+
         /* ── Stats with number tickers (MagicUI) ── */
         .stats {
             display: flex;
@@ -224,6 +238,14 @@
     <section class="hero">
         <h1 class="name blur-fade">Chris Miglioranzi</h1>
 
+        <p class="bio blur-fade">
+            Co-founder and CEO of <strong>Respective Collective</strong>, a media agency known
+            for its viral reach. Originally from Daytona Beach, Florida, Chris has helped generate
+            over <strong>100 billion views</strong> for clients including Don Lemon, Spotify,
+            Raising Cane&rsquo;s, Coachella, and Nike. Off the clock, he&rsquo;s building community,
+            volunteering at his local animal shelter, and a loyal (if long-suffering) Buffalo Bills fan.
+        </p>
+
         <div class="stats blur-fade">
             <div class="stat">
                 <div class="stat-number"><span class="ticker" data-target="100">0</span>B+</div>
@@ -240,7 +262,7 @@
         </div>
 
         <div class="blur-fade">
-            <a href="mailto:Chris@gmail.com" class="shimmer-button"><span>Chris@gmail.com</span></a>
+            <a href="mailto:chris@respectivecollective.com" class="shimmer-button"><span>chris@respectivecollective.com</span></a>
         </div>
     </section>
 
