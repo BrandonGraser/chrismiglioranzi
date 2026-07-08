@@ -48,6 +48,7 @@
             position: relative;
             z-index: 1;
             min-height: 100vh;
+            min-height: 100dvh;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -211,7 +212,10 @@
         /* ── Mobile ── */
         @media (max-width: 640px) {
             .hero {
-                gap: 2.25rem;
+                gap: 1.75rem;
+                justify-content: flex-start;
+                padding-top: clamp(2rem, 8vh, 4.5rem);
+                padding-bottom: 2.5rem;
             }
 
             .name {
