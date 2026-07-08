@@ -213,21 +213,33 @@
                 gap: 2.25rem;
             }
 
+            .name {
+                font-size: clamp(3.5rem, 15vw, 5rem);
+                line-height: 1.02;
+            }
+
+            .name-first,
+            .name-last {
+                display: block;
+            }
+
             .stats {
-                flex-direction: column;
-                gap: 1.75rem;
+                flex-direction: row;
+                gap: 0;
             }
 
             .stat {
-                padding: 0;
-            }
-
-            .stat + .stat {
-                border-left: none;
+                flex: 1;
+                padding: 0 0.75rem;
             }
 
             .stat-number {
-                font-size: 2rem;
+                font-size: clamp(1.35rem, 6vw, 1.9rem);
+            }
+
+            .stat-label {
+                font-size: 0.6rem;
+                letter-spacing: 0.06em;
             }
         }
     </style>
@@ -236,7 +248,7 @@
     <canvas id="flickering-grid"></canvas>
 
     <section class="hero">
-        <h1 class="name blur-fade">Chris Miglioranzi</h1>
+        <h1 class="name blur-fade"><span class="name-first">Chris</span> <span class="name-last">Miglioranzi</span></h1>
 
         <p class="bio blur-fade">
             Co-founder and CEO of <strong>Respective Collective</strong>, a media agency known
