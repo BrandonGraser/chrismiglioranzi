@@ -291,10 +291,9 @@
             const ctx = canvas.getContext('2d');
             const digits = '0123456789';
             const fontSize = 14;
-            const interval = 90;   // ms per row — slow, Matrix-esque fall
             const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-            let width, height, columns, drops;
+            let width, height, columns, drops, intervals, nextTick;
 
             function setup() {
                 width = window.innerWidth;
@@ -303,40 +302,41 @@
                 canvas.height = height;
                 columns = Math.ceil(width / fontSize);
                 drops = [];
+                intervals = [];
+                nextTick = [];
                 for (let i = 0; i < columns; i++) {
                     // stagger start positions above the top for varied streaks
                     drops[i] = Math.floor(Math.random() * -height / fontSize);
+                    // each column falls at its own speed (ms per row)
+                    intervals[i] = 45 + Math.random() * 70;
+                    nextTick[i] = 0;
                 }
             }
 
-            function step() {
-                // low-alpha bg pass leaves long fading trails
-                ctx.fillStyle = 'rgba(9, 9, 11, 0.09)';
+            let lastFrame = 0;
+            function loop(now) {
+                const dt = lastFrame ? now - lastFrame : 16;
+                lastFrame = now;
+
+                // time-based fade keeps trail length bounded across speeds
+                ctx.fillStyle = `rgba(9, 9, 11, ${Math.min(0.20 * dt / 80, 0.5)})`;
                 ctx.fillRect(0, 0, width, height);
                 ctx.font = `${fontSize}px 'JetBrains Mono', ui-monospace, monospace`;
                 ctx.textBaseline = 'top';
+                ctx.fillStyle = 'rgba(240, 240, 245, 0.82)';
 
                 for (let i = 0; i < columns; i++) {
+                    if (now < nextTick[i]) continue;
+                    nextTick[i] = now + intervals[i];
+
                     const x = i * fontSize;
                     const y = drops[i] * fontSize;
-                    const char = digits[Math.floor(Math.random() * digits.length)];
-
-                    // bright white leading glyph; trail is the residual fade above
-                    ctx.fillStyle = 'rgba(240, 240, 245, 0.82)';
-                    ctx.fillText(char, x, y);
+                    ctx.fillText(digits[Math.floor(Math.random() * digits.length)], x, y);
 
                     drops[i]++;
                     if (y > height && Math.random() > 0.975) {
                         drops[i] = Math.floor(Math.random() * -20);
                     }
-                }
-            }
-
-            let last = 0;
-            function loop(now) {
-                if (now - last >= interval) {
-                    step();
-                    last = now;
                 }
                 requestAnimationFrame(loop);
             }
