@@ -306,13 +306,13 @@
                 speeds = [];
                 for (let i = 0; i < columns; i++) {
                     drops[i] = Math.random() * -height / fontSize;
-                    speeds[i] = 0.25 + Math.random() * 0.4;
+                    speeds[i] = 0.06 + Math.random() * 0.09;
                 }
             }
 
             function draw() {
                 // translucent bg pass leaves fading trails
-                ctx.fillStyle = 'rgba(9, 9, 11, 0.12)';
+                ctx.fillStyle = 'rgba(9, 9, 11, 0.06)';
                 ctx.fillRect(0, 0, width, height);
                 ctx.font = `${fontSize}px 'JetBrains Mono', ui-monospace, monospace`;
 
