@@ -40,8 +40,8 @@
             height: 100%;
             z-index: 0;
             pointer-events: none;
-            -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 45%, transparent 20%, black 90%);
-            mask-image: radial-gradient(ellipse 75% 65% at 50% 45%, transparent 20%, black 90%);
+            -webkit-mask-image: radial-gradient(ellipse 80% 72% at 50% 45%, transparent 28%, black 92%);
+            mask-image: radial-gradient(ellipse 80% 72% at 50% 45%, transparent 28%, black 92%);
         }
 
         .hero {
@@ -285,71 +285,78 @@
     </section>
 
     <script>
-        // ── Matrix rain background (digits, subtle, muted whiteish) ──
+        // ── Matrix rain background (digits, white, dense classic style) ──
         (() => {
             const canvas = document.getElementById('matrix-rain');
             const ctx = canvas.getContext('2d');
-            const color = '180, 180, 190';        // muted whiteish-gray
-            const fontSize = 15;
             const digits = '0123456789';
+            const fontSize = 14;
+            const interval = 90;   // ms per row — slow, Matrix-esque fall
             const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-            let width, height, columns, drops, speeds;
+            let width, height, columns, drops;
 
             function setup() {
                 width = window.innerWidth;
                 height = window.innerHeight;
                 canvas.width = width;
                 canvas.height = height;
-                columns = Math.floor(width / fontSize);
+                columns = Math.ceil(width / fontSize);
                 drops = [];
-                speeds = [];
                 for (let i = 0; i < columns; i++) {
-                    drops[i] = Math.random() * -height / fontSize;
-                    speeds[i] = 0.06 + Math.random() * 0.09;
+                    // stagger start positions above the top for varied streaks
+                    drops[i] = Math.floor(Math.random() * -height / fontSize);
                 }
             }
 
-            function draw() {
-                // translucent bg pass leaves fading trails
-                ctx.fillStyle = 'rgba(9, 9, 11, 0.06)';
+            function step() {
+                // low-alpha bg pass leaves long fading trails
+                ctx.fillStyle = 'rgba(9, 9, 11, 0.09)';
                 ctx.fillRect(0, 0, width, height);
                 ctx.font = `${fontSize}px 'JetBrains Mono', ui-monospace, monospace`;
+                ctx.textBaseline = 'top';
 
                 for (let i = 0; i < columns; i++) {
                     const x = i * fontSize;
                     const y = drops[i] * fontSize;
                     const char = digits[Math.floor(Math.random() * digits.length)];
 
-                    // brighter leading glyph, faint trail
-                    ctx.fillStyle = `rgba(${color}, 0.16)`;
-                    ctx.fillText(char, x, y);
-                    ctx.fillStyle = `rgba(230, 230, 235, 0.28)`;
+                    // bright white leading glyph; trail is the residual fade above
+                    ctx.fillStyle = 'rgba(240, 240, 245, 0.82)';
                     ctx.fillText(char, x, y);
 
-                    drops[i] += speeds[i];
-                    if (y > height && Math.random() > 0.98) {
-                        drops[i] = Math.random() * -20;
+                    drops[i]++;
+                    if (y > height && Math.random() > 0.975) {
+                        drops[i] = Math.floor(Math.random() * -20);
                     }
                 }
-                requestAnimationFrame(draw);
+            }
+
+            let last = 0;
+            function loop(now) {
+                if (now - last >= interval) {
+                    step();
+                    last = now;
+                }
+                requestAnimationFrame(loop);
             }
 
             setup();
             window.addEventListener('resize', setup);
             if (reduceMotion) {
-                // single faint static pass, no animation
+                // single dense static pass, no animation
                 ctx.font = `${fontSize}px 'JetBrains Mono', ui-monospace, monospace`;
-                ctx.fillStyle = `rgba(${color}, 0.1)`;
+                ctx.textBaseline = 'top';
+                ctx.fillStyle = 'rgba(220, 220, 228, 0.18)';
                 for (let i = 0; i < columns; i++) {
                     for (let j = 0; j < Math.ceil(height / fontSize); j++) {
-                        if (Math.random() > 0.85) {
+                        if (Math.random() > 0.55) {
                             ctx.fillText(digits[Math.floor(Math.random() * digits.length)], i * fontSize, j * fontSize);
                         }
                     }
                 }
             } else {
-                requestAnimationFrame(draw);
+                requestAnimationFrame(loop);
             }
         })();
 
