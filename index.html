@@ -40,6 +40,8 @@
             height: 100%;
             z-index: 0;
             pointer-events: none;
+            /* tiny gaussian blur + slight vertical motion blur (fall direction) */
+            filter: blur(0.35px) url(#matrix-motion);
             -webkit-mask-image: radial-gradient(ellipse 80% 72% at 50% 45%, transparent 28%, black 92%);
             mask-image: radial-gradient(ellipse 80% 72% at 50% 45%, transparent 28%, black 92%);
         }
@@ -251,6 +253,12 @@
 </head>
 <body>
     <canvas id="matrix-rain"></canvas>
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+        <filter id="matrix-motion" x="-10%" y="-10%" width="120%" height="120%">
+            <!-- x=0, y=0.6: blur only along the vertical fall direction -->
+            <feGaussianBlur stdDeviation="0 0.6" />
+        </filter>
+    </svg>
 
     <section class="hero">
         <h1 class="name blur-fade"><span class="name-first">Chris</span> <span class="name-last">Miglioranzi</span></h1>
