@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin · Chris Miglioranzi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/admin.css">
+</head>
+<body>
+    <canvas id="matrix-rain"></canvas>
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+        <filter id="matrix-motion" x="-10%" y="-10%" width="120%" height="120%">
+            <feGaussianBlur stdDeviation="0 0.6" />
+        </filter>
+    </svg>
+
+    <!-- The exact hero markup is injected here from index.html at runtime -->
+    <main id="stage"></main>
+
+    <!-- Editing toolbar (shown once signed in) -->
+    <div id="admin-bar" hidden>
+        <span class="admin-hint">Click any text to edit, then <strong>Publish</strong>.</span>
+        <span id="admin-status" class="admin-status"></span>
+        <button id="publish-btn" class="admin-bar-btn primary" disabled>Publish</button>
+        <button id="logout-btn" class="admin-bar-btn">Log out</button>
+    </div>
+
+    <!-- Login gate -->
+    <div id="login-overlay" hidden>
+        <form id="login-form" class="login-card">
+            <h1>Site Editor</h1>
+            <p>Enter the password to edit the site.</p>
+            <input id="login-password" type="password" autocomplete="current-password"
+                   placeholder="Password" aria-label="Password" required>
+            <button id="login-submit" type="submit">Sign in</button>
+            <div id="login-error" class="login-error" role="alert"></div>
+        </form>
+    </div>
+
+    <script src="/matrix.js"></script>
+    <script src="/content.js"></script>
+    <script src="/admin.js"></script>
+</body>
+</html>

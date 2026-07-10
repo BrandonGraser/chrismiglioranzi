@@ -1,0 +1,249 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #09090b;
+    --fg: #fafafa;
+    --muted: #a1a1aa;
+    --muted-2: #71717a;
+    --border: rgba(255, 255, 255, 0.1);
+}
+
+body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-feature-settings: 'cv11';
+    min-height: 100vh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── Matrix rain background ── */
+#matrix-rain {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+    /* tiny gaussian blur + slight vertical motion blur (fall direction) */
+    filter: blur(0.35px) url(#matrix-motion);
+    -webkit-mask-image: radial-gradient(ellipse 80% 72% at 50% 45%, transparent 28%, black 92%);
+    mask-image: radial-gradient(ellipse 80% 72% at 50% 45%, transparent 28%, black 92%);
+}
+
+/* the SVG url() filter is too costly on mobile GPUs — keep only the cheap blur */
+@media (max-width: 640px) {
+    #matrix-rain {
+        filter: blur(0.4px);
+        opacity: 0.7;   /* dial the background effect back 30% on mobile */
+    }
+}
+
+.hero {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 3rem;
+    padding: 2rem 1.5rem;
+    text-align: center;
+}
+
+/* ── Blur fade entrance (MagicUI) ── */
+@keyframes blur-fade-up {
+    from {
+        opacity: 0;
+        filter: blur(8px);
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0);
+    }
+}
+
+.blur-fade {
+    opacity: 0;
+    animation: blur-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.blur-fade:nth-child(1) { animation-delay: 0.1s; }
+.blur-fade:nth-child(2) { animation-delay: 0.3s; }
+.blur-fade:nth-child(3) { animation-delay: 0.5s; }
+.blur-fade:nth-child(4) { animation-delay: 0.7s; }
+
+.name {
+    font-size: clamp(2.75rem, 7vw, 5.5rem);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    padding-bottom: 0.1em;
+    background: linear-gradient(180deg, #fafafa 30%, rgba(250, 250, 250, 0.55) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.bio {
+    max-width: 40rem;
+    font-size: clamp(0.95rem, 1.4vw, 1.075rem);
+    font-weight: 400;
+    line-height: 1.75;
+    color: var(--muted);
+    margin-top: -1rem;
+}
+
+.bio strong {
+    font-weight: 500;
+    color: var(--fg);
+}
+
+/* ── Stats with number tickers (MagicUI) ── */
+.stats {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+}
+
+.stat {
+    padding: 0 3rem;
+    text-align: center;
+}
+
+.stat + .stat {
+    border-left: 1px solid var(--border);
+}
+
+.stat-number {
+    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.2;
+    margin-bottom: 0.35rem;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+}
+
+/* ── Shimmer button (MagicUI) ── */
+.shimmer-button {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    background: #000;
+    color: var(--fg);
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 0.9rem 2.25rem;
+    white-space: nowrap;
+    box-shadow: inset 0 -8px 10px rgba(255, 255, 255, 0.12);
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+.shimmer-button:hover {
+    box-shadow: inset 0 -6px 10px rgba(255, 255, 255, 0.25);
+}
+
+.shimmer-button:active {
+    transform: translateY(1px);
+}
+
+.shimmer-button::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 300%;
+    aspect-ratio: 1;
+    background: conic-gradient(from 225deg, transparent 0deg, #ffffff 90deg, transparent 90.5deg);
+    animation: shimmer-spin 3s linear infinite;
+    filter: blur(2px);
+}
+
+@keyframes shimmer-spin {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+.shimmer-button::after {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    border-radius: inherit;
+    background: #000;
+}
+
+.shimmer-button span {
+    position: relative;
+    z-index: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .blur-fade {
+        animation-duration: 0.01ms;
+        animation-delay: 0s;
+    }
+    .shimmer-button::before {
+        animation: none;
+    }
+}
+
+/* ── Mobile ── */
+@media (max-width: 640px) {
+    .hero {
+        gap: 1.75rem;
+        justify-content: flex-start;
+        padding-top: clamp(2rem, 8vh, 4.5rem);
+        padding-bottom: 2.5rem;
+    }
+
+    .name {
+        font-size: clamp(3.5rem, 15vw, 5rem);
+        line-height: 1.14;
+    }
+
+    .name-first,
+    .name-last {
+        display: block;
+    }
+
+    .stats {
+        flex-direction: row;
+        gap: 0;
+    }
+
+    .stat {
+        flex: 1;
+        padding: 0 0.75rem;
+    }
+
+    .stat-number {
+        font-size: clamp(1.35rem, 6vw, 1.9rem);
+    }
+
+    .stat-label {
+        font-size: 0.6rem;
+        letter-spacing: 0.06em;
+    }
+}

@@ -7,257 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --bg: #09090b;
-            --fg: #fafafa;
-            --muted: #a1a1aa;
-            --muted-2: #71717a;
-            --border: rgba(255, 255, 255, 0.1);
-        }
-
-        body {
-            background: var(--bg);
-            color: var(--fg);
-            font-family: 'Inter', system-ui, sans-serif;
-            font-feature-settings: 'cv11';
-            min-height: 100vh;
-            overflow-x: hidden;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* ── Matrix rain background ── */
-        #matrix-rain {
-            position: fixed;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-            /* tiny gaussian blur + slight vertical motion blur (fall direction) */
-            filter: blur(0.35px) url(#matrix-motion);
-            -webkit-mask-image: radial-gradient(ellipse 80% 72% at 50% 45%, transparent 28%, black 92%);
-            mask-image: radial-gradient(ellipse 80% 72% at 50% 45%, transparent 28%, black 92%);
-        }
-
-        /* the SVG url() filter is too costly on mobile GPUs — keep only the cheap blur */
-        @media (max-width: 640px) {
-            #matrix-rain {
-                filter: blur(0.4px);
-                opacity: 0.7;   /* dial the background effect back 30% on mobile */
-            }
-        }
-
-        .hero {
-            position: relative;
-            z-index: 1;
-            min-height: 100vh;
-            min-height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 3rem;
-            padding: 2rem 1.5rem;
-            text-align: center;
-        }
-
-        /* ── Blur fade entrance (MagicUI) ── */
-        @keyframes blur-fade-up {
-            from {
-                opacity: 0;
-                filter: blur(8px);
-                transform: translateY(16px);
-            }
-            to {
-                opacity: 1;
-                filter: blur(0);
-                transform: translateY(0);
-            }
-        }
-
-        .blur-fade {
-            opacity: 0;
-            animation: blur-fade-up 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
-
-        .blur-fade:nth-child(1) { animation-delay: 0.1s; }
-        .blur-fade:nth-child(2) { animation-delay: 0.3s; }
-        .blur-fade:nth-child(3) { animation-delay: 0.5s; }
-        .blur-fade:nth-child(4) { animation-delay: 0.7s; }
-
-        .name {
-            font-size: clamp(2.75rem, 7vw, 5.5rem);
-            font-weight: 600;
-            letter-spacing: -0.03em;
-            line-height: 1.1;
-            padding-bottom: 0.1em;
-            background: linear-gradient(180deg, #fafafa 30%, rgba(250, 250, 250, 0.55) 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .bio {
-            max-width: 40rem;
-            font-size: clamp(0.95rem, 1.4vw, 1.075rem);
-            font-weight: 400;
-            line-height: 1.75;
-            color: var(--muted);
-            margin-top: -1rem;
-        }
-
-        .bio strong {
-            font-weight: 500;
-            color: var(--fg);
-        }
-
-        /* ── Stats with number tickers (MagicUI) ── */
-        .stats {
-            display: flex;
-            align-items: stretch;
-            gap: 0;
-        }
-
-        .stat {
-            padding: 0 3rem;
-            text-align: center;
-        }
-
-        .stat + .stat {
-            border-left: 1px solid var(--border);
-        }
-
-        .stat-number {
-            font-size: clamp(1.75rem, 3.5vw, 2.5rem);
-            font-weight: 600;
-            letter-spacing: -0.02em;
-            font-variant-numeric: tabular-nums;
-            line-height: 1.2;
-            margin-bottom: 0.35rem;
-        }
-
-        .stat-label {
-            font-size: 0.75rem;
-            font-weight: 500;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
-            color: var(--muted-2);
-        }
-
-        /* ── Shimmer button (MagicUI) ── */
-        .shimmer-button {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            border: 1px solid var(--border);
-            border-radius: 100px;
-            background: #000;
-            color: var(--fg);
-            font-size: 0.95rem;
-            font-weight: 500;
-            text-decoration: none;
-            padding: 0.9rem 2.25rem;
-            white-space: nowrap;
-            box-shadow: inset 0 -8px 10px rgba(255, 255, 255, 0.12);
-            transition: box-shadow 0.3s ease, transform 0.3s ease;
-        }
-
-        .shimmer-button:hover {
-            box-shadow: inset 0 -6px 10px rgba(255, 255, 255, 0.25);
-        }
-
-        .shimmer-button:active {
-            transform: translateY(1px);
-        }
-
-        .shimmer-button::before {
-            content: '';
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            width: 300%;
-            aspect-ratio: 1;
-            background: conic-gradient(from 225deg, transparent 0deg, #ffffff 90deg, transparent 90.5deg);
-            animation: shimmer-spin 3s linear infinite;
-            filter: blur(2px);
-        }
-
-        @keyframes shimmer-spin {
-            from { transform: translate(-50%, -50%) rotate(0deg); }
-            to { transform: translate(-50%, -50%) rotate(360deg); }
-        }
-
-        .shimmer-button::after {
-            content: '';
-            position: absolute;
-            inset: 1px;
-            border-radius: inherit;
-            background: #000;
-        }
-
-        .shimmer-button span {
-            position: relative;
-            z-index: 1;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .blur-fade {
-                animation-duration: 0.01ms;
-                animation-delay: 0s;
-            }
-            .shimmer-button::before {
-                animation: none;
-            }
-        }
-
-        /* ── Mobile ── */
-        @media (max-width: 640px) {
-            .hero {
-                gap: 1.75rem;
-                justify-content: flex-start;
-                padding-top: clamp(2rem, 8vh, 4.5rem);
-                padding-bottom: 2.5rem;
-            }
-
-            .name {
-                font-size: clamp(3.5rem, 15vw, 5rem);
-                line-height: 1.14;
-            }
-
-            .name-first,
-            .name-last {
-                display: block;
-            }
-
-            .stats {
-                flex-direction: row;
-                gap: 0;
-            }
-
-            .stat {
-                flex: 1;
-                padding: 0 0.75rem;
-            }
-
-            .stat-number {
-                font-size: clamp(1.35rem, 6vw, 1.9rem);
-            }
-
-            .stat-label {
-                font-size: 0.6rem;
-                letter-spacing: 0.06em;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
     <canvas id="matrix-rain"></canvas>
@@ -269,9 +19,9 @@
     </svg>
 
     <section class="hero">
-        <h1 class="name blur-fade"><span class="name-first">Chris</span> <span class="name-last">Miglioranzi</span></h1>
+        <h1 class="name blur-fade"><span class="name-first" data-edit="nameFirst">Chris</span> <span class="name-last" data-edit="nameLast">Miglioranzi</span></h1>
 
-        <p class="bio blur-fade">
+        <p class="bio blur-fade" data-edit="bio">
             Co-founder and CEO of <strong>Respective Collective</strong>, a media agency known
             for its viral reach. Originally from Daytona Beach, Florida, Chris has helped generate
             over <strong>100 billion views</strong> for clients including Don Lemon, Spotify,
@@ -282,162 +32,26 @@
 
         <div class="stats blur-fade">
             <div class="stat">
-                <div class="stat-number"><span class="ticker" data-target="100">0</span>B+</div>
-                <div class="stat-label">Views Generated</div>
+                <div class="stat-number" data-edit="stat1Value" data-stat>100B+</div>
+                <div class="stat-label" data-edit="stat1Label">Views Generated</div>
             </div>
             <div class="stat">
-                <div class="stat-number"><span class="ticker" data-target="200">0</span>+</div>
-                <div class="stat-label">Brands Voiced</div>
+                <div class="stat-number" data-edit="stat2Value" data-stat>200+</div>
+                <div class="stat-label" data-edit="stat2Label">Brands Voiced</div>
             </div>
             <div class="stat">
-                <div class="stat-number">$<span class="ticker" data-target="50">0</span>M+</div>
-                <div class="stat-label">Revenue Driven</div>
+                <div class="stat-number" data-edit="stat3Value" data-stat>$50M+</div>
+                <div class="stat-label" data-edit="stat3Label">Revenue Driven</div>
             </div>
         </div>
 
         <div class="blur-fade">
-            <a href="mailto:chris@respectivecollective.com" class="shimmer-button"><span>chris@respectivecollective.com</span></a>
+            <a href="mailto:chris@respectivecollective.com" class="shimmer-button"><span data-edit="email">chris@respectivecollective.com</span></a>
         </div>
     </section>
 
-    <script>
-        // ── Matrix rain background (digits, white, per-cell brightness grid) ──
-        (() => {
-            const canvas = document.getElementById('matrix-rain');
-            const ctx = canvas.getContext('2d');
-            const digits = '0123456789';
-            const fadeMs = 900;      // time for a passed streak to fade out
-            const minBright = 0.04;  // below this a cell is fully cleared (no ghosting)
-            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-            let width, height, fontSize, minFrameMs, cols, rows, bright, glyph, heads, intervals, nextTick;
-
-            function setup() {
-                width = window.innerWidth;
-                height = window.innerHeight;
-                const mobile = width <= 640;
-                fontSize = mobile ? 18 : 14;    // fewer, larger cells on mobile
-                minFrameMs = mobile ? 32 : 0;   // cap mobile to ~30fps
-                canvas.width = width;
-                canvas.height = height;
-                cols = Math.ceil(width / fontSize);
-                rows = Math.ceil(height / fontSize) + 1;
-                bright = new Float32Array(cols * rows);   // per-cell brightness 0..1
-                glyph = new Uint8Array(cols * rows);      // per-cell digit, held while it fades
-                heads = [];
-                intervals = [];
-                nextTick = [];
-                for (let i = 0; i < cols; i++) {
-                    heads[i] = Math.floor(Math.random() * -rows);   // start above the top
-                    intervals[i] = 45 + Math.random() * 70;         // each column its own speed
-                    nextTick[i] = 0;
-                }
-            }
-
-            let lastFrame = 0;
-            function loop(now) {
-                requestAnimationFrame(loop);
-                if (lastFrame && now - lastFrame < minFrameMs) return;
-                const dt = lastFrame ? now - lastFrame : 16;
-                lastFrame = now;
-
-                // decay every cell toward zero, snapping small values to a hard 0
-                const decay = Math.pow(minBright, dt / fadeMs);
-                for (let k = 0; k < bright.length; k++) {
-                    if (bright[k] === 0) continue;
-                    bright[k] *= decay;
-                    if (bright[k] < minBright) bright[k] = 0;
-                }
-
-                // advance each column's head at its own pace, lighting a fresh cell
-                for (let i = 0; i < cols; i++) {
-                    if (now < nextTick[i]) continue;
-                    nextTick[i] = now + intervals[i];
-                    heads[i]++;
-                    if (heads[i] >= rows) {
-                        if (Math.random() > 0.5) heads[i] = 0; else continue;
-                    }
-                    if (heads[i] >= 0) {
-                        const k = heads[i] * cols + i;
-                        bright[k] = 1;
-                        glyph[k] = Math.floor(Math.random() * 10);
-                    }
-                }
-
-                // redraw from scratch — overwrite, never accumulate
-                ctx.clearRect(0, 0, width, height);
-                ctx.font = `${fontSize}px 'JetBrains Mono', ui-monospace, monospace`;
-                ctx.textBaseline = 'top';
-                for (let j = 0; j < rows; j++) {
-                    for (let i = 0; i < cols; i++) {
-                        const v = bright[j * cols + i];
-                        if (v === 0) continue;
-                        ctx.fillStyle = `rgba(240, 240, 245, ${(v * 0.85).toFixed(3)})`;
-                        ctx.fillText(digits[glyph[j * cols + i]], i * fontSize, j * fontSize);
-                    }
-                }
-            }
-
-            setup();
-            window.addEventListener('resize', setup);
-            if (reduceMotion) {
-                // single dense static pass, no animation
-                ctx.font = `${fontSize}px 'JetBrains Mono', ui-monospace, monospace`;
-                ctx.textBaseline = 'top';
-                ctx.fillStyle = 'rgba(220, 220, 228, 0.18)';
-                for (let i = 0; i < cols; i++) {
-                    for (let j = 0; j < rows; j++) {
-                        if (Math.random() > 0.55) {
-                            ctx.fillText(digits[Math.floor(Math.random() * 10)], i * fontSize, j * fontSize);
-                        }
-                    }
-                }
-            } else {
-                requestAnimationFrame(loop);
-            }
-        })();
-
-        // ── Number ticker (adapted from MagicUI NumberTicker) ──
-        (() => {
-            const tickers = document.querySelectorAll('.ticker');
-            const formatter = new Intl.NumberFormat('en-US');
-            let started = false;
-
-            function springTo(el, target) {
-                // Critically-damped-ish spring matching MagicUI's damping: 60, stiffness: 100
-                let value = 0;
-                let velocity = 0;
-                const stiffness = 100;
-                const damping = 26;
-                let last = performance.now();
-
-                function step(now) {
-                    const dt = Math.min((now - last) / 1000, 0.064);
-                    last = now;
-                    const accel = stiffness * (target - value) - damping * velocity;
-                    velocity += accel * dt;
-                    value += velocity * dt;
-                    if (Math.abs(target - value) < 0.5 && Math.abs(velocity) < 0.5) {
-                        el.textContent = formatter.format(target);
-                        return;
-                    }
-                    el.textContent = formatter.format(Math.round(value));
-                    requestAnimationFrame(step);
-                }
-                requestAnimationFrame(step);
-            }
-
-            function start() {
-                if (started) return;
-                started = true;
-                tickers.forEach(el => springTo(el, parseInt(el.dataset.target, 10)));
-            }
-
-            const observer = new IntersectionObserver(entries => {
-                if (entries[0].isIntersecting) start();
-            }, { threshold: 0.5 });
-            observer.observe(document.querySelector('.stats'));
-        })();
-    </script>
+    <script src="/matrix.js"></script>
+    <script src="/content.js"></script>
+    <script src="/site.js"></script>
 </body>
 </html>

@@ -1,0 +1,177 @@
+/* ── Admin-only chrome (login overlay, toolbar, editable affordances) ── */
+
+/* Login gate */
+#login-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: rgba(9, 9, 11, 0.72);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+
+#login-overlay[hidden] { display: none; }
+
+.login-card {
+    width: 100%;
+    max-width: 360px;
+    padding: 2rem;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: rgba(24, 24, 27, 0.9);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    text-align: center;
+}
+
+.login-card h1 {
+    font-size: 1.15rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-bottom: 0.35rem;
+}
+
+.login-card p {
+    font-size: 0.85rem;
+    color: var(--muted-2);
+    margin-bottom: 1.5rem;
+}
+
+.login-card input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    font-family: inherit;
+    color: var(--fg);
+    background: #09090b;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.login-card input:focus { border-color: rgba(255, 255, 255, 0.35); }
+
+.login-card button {
+    width: 100%;
+    margin-top: 0.9rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    font-family: inherit;
+    color: #09090b;
+    background: var(--fg);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+}
+
+.login-card button:hover { opacity: 0.9; }
+.login-card button:disabled { opacity: 0.5; cursor: default; }
+
+.login-error {
+    min-height: 1.1rem;
+    margin-top: 0.75rem;
+    font-size: 0.8rem;
+    color: #f87171;
+}
+
+/* Editing toolbar */
+#admin-bar {
+    position: fixed;
+    left: 50%;
+    bottom: 1.25rem;
+    transform: translateX(-50%);
+    z-index: 40;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.75rem 0.6rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    background: rgba(24, 24, 27, 0.92);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+    max-width: calc(100vw - 2rem);
+}
+
+#admin-bar[hidden] { display: none; }
+
+.admin-hint {
+    font-size: 0.8rem;
+    color: var(--muted);
+    white-space: nowrap;
+}
+
+.admin-hint strong { color: var(--fg); font-weight: 600; }
+
+.admin-bar-btn {
+    padding: 0.5rem 1.1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: inherit;
+    border-radius: 100px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--fg);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s ease, opacity 0.2s ease;
+}
+
+.admin-bar-btn:hover { background: rgba(255, 255, 255, 0.08); }
+
+.admin-bar-btn.primary {
+    background: var(--fg);
+    color: #09090b;
+    border-color: transparent;
+}
+
+.admin-bar-btn.primary:disabled { opacity: 0.45; cursor: default; }
+
+.admin-status {
+    font-size: 0.8rem;
+    color: var(--muted-2);
+    white-space: nowrap;
+}
+
+/* Editable elements */
+[data-edit] {
+    cursor: text;
+    border-radius: 4px;
+    outline: 1px dashed transparent;
+    outline-offset: 3px;
+    transition: outline-color 0.15s ease, background 0.15s ease;
+}
+
+body.admin-ready [data-edit]:hover {
+    outline-color: rgba(255, 255, 255, 0.35);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+[data-edit][contenteditable="true"] {
+    outline: 1px solid rgba(120, 170, 255, 0.9);
+    background: rgba(120, 170, 255, 0.08);
+    -webkit-text-fill-color: currentColor;   /* override the name's gradient clip while editing */
+    color: var(--fg);
+    cursor: text;
+}
+
+/* keep the gradient name legible/selectable while editing */
+.name[contenteditable="true"] .name-first,
+.name[contenteditable="true"] .name-last { -webkit-text-fill-color: currentColor; }
+
+@media (max-width: 640px) {
+    #admin-bar {
+        flex-wrap: wrap;
+        justify-content: center;
+        border-radius: 20px;
+        padding: 0.75rem;
+    }
+    .admin-hint { width: 100%; text-align: center; white-space: normal; }
+}
