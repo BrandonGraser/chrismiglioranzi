@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact — Chris Miglioranzi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <canvas id="matrix-rain"></canvas>
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+        <filter id="matrix-motion" x="-10%" y="-10%" width="120%" height="120%">
+            <feGaussianBlur stdDeviation="0 0.6" />
+        </filter>
+    </svg>
+
+    <nav class="site-nav blur-fade" aria-label="Primary navigation">
+        <a href="/">Home</a>
+    </nav>
+
+    <main class="contact-page">
+        <img class="contact-photo blur-fade" src="/chris-contact.png" alt="Portrait of Chris Miglioranzi wearing a fur-lined hood and sunglasses">
+        <div class="contact-copy">
+            <p class="bio blur-fade" data-edit="bio">
+                Co-founder and CEO of <strong>Respective Collective</strong>, a media agency known
+                for its viral reach. Originally from Daytona Beach, Florida, Chris has helped generate
+                over <strong>100 billion views</strong> for clients including Don Lemon, Spotify,
+                Raising Cane&rsquo;s, Coachella, and Nike. Off the clock, he&rsquo;s building community,
+                volunteering at his local animal shelter, and maintaining a long-suffering
+                (but loyal) fandom of the Buffalo Bills.
+            </p>
+            <div class="blur-fade">
+                <a href="mailto:chris@respectivecollective.com" class="shimmer-button"><span data-edit="email">chris@respectivecollective.com</span></a>
+            </div>
+        </div>
+    </main>
+
+    <script src="/matrix.js"></script>
+    <script src="/content.js"></script>
+    <script src="/site.js"></script>
+</body>
+</html>

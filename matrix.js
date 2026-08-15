@@ -74,7 +74,7 @@ window.startMatrix = function startMatrix() {
             for (let i = 0; i < cols; i++) {
                 const v = bright[j * cols + i];
                 if (v === 0) continue;
-                ctx.fillStyle = `rgba(240, 240, 245, ${(v * 0.85).toFixed(3)})`;
+                ctx.fillStyle = `rgba(255, 35, 45, ${(v * 0.9).toFixed(3)})`;
                 ctx.fillText(digits[glyph[j * cols + i]], i * fontSize, j * fontSize);
             }
         }
@@ -86,7 +86,7 @@ window.startMatrix = function startMatrix() {
         // single dense static pass, no animation
         ctx.font = `${fontSize}px 'JetBrains Mono', ui-monospace, monospace`;
         ctx.textBaseline = 'top';
-        ctx.fillStyle = 'rgba(220, 220, 228, 0.18)';
+        ctx.fillStyle = 'rgba(255, 35, 45, 0.2)';
         for (let i = 0; i < cols; i++) {
             for (let j = 0; j < rows; j++) {
                 if (Math.random() > 0.55) {

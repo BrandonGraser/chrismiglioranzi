@@ -22,6 +22,25 @@ body {
     -webkit-font-smoothing: antialiased;
 }
 
+.site-nav {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    z-index: 2;
+}
+
+.site-nav a {
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-decoration: none;
+    text-transform: uppercase;
+    transition: color 0.2s ease;
+}
+
+.site-nav a:hover { color: var(--fg); }
+
 /* ── Matrix rain background ── */
 #matrix-rain {
     position: fixed;
@@ -107,6 +126,35 @@ body {
     font-weight: 500;
     color: var(--fg);
 }
+
+.contact-page {
+    position: relative;
+    z-index: 1;
+    width: min(68rem, calc(100% - 3rem));
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin: 0 auto;
+    padding: 7rem 0 4rem;
+}
+
+.contact-photo {
+    display: block;
+    width: 100%;
+    max-height: 72vh;
+    object-fit: cover;
+    object-position: center 38%;
+    border: 1px solid var(--border);
+}
+
+.contact-copy {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 3rem;
+    padding-top: 2.5rem;
+}
+
+.contact-copy .bio { margin-top: 0; }
 
 /* ── Stats with number tickers (MagicUI) ── */
 .stats {
@@ -211,6 +259,11 @@ body {
 
 /* ── Mobile ── */
 @media (max-width: 640px) {
+    .site-nav {
+        top: 1.5rem;
+        right: 1.5rem;
+    }
+
     .hero {
         gap: 1.75rem;
         justify-content: flex-start;
@@ -245,5 +298,21 @@ body {
     .stat-label {
         font-size: 0.6rem;
         letter-spacing: 0.06em;
+    }
+
+    .contact-page {
+        width: min(100% - 2rem, 34rem);
+        padding-top: 5.5rem;
+    }
+
+    .contact-photo {
+        max-height: none;
+        aspect-ratio: 4 / 5;
+    }
+
+    .contact-copy {
+        flex-direction: column;
+        gap: 2rem;
+        padding-top: 2rem;
     }
 }
