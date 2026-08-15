@@ -23,9 +23,9 @@ body {
 }
 
 .site-nav {
-    position: fixed;
-    top: 2rem;
-    right: 2rem;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
     z-index: 2;
 }
 
@@ -260,14 +260,14 @@ body {
 /* ── Mobile ── */
 @media (max-width: 640px) {
     .site-nav {
-        top: 1.5rem;
-        right: 1.5rem;
+        top: 1rem;
+        right: 1rem;
     }
 
     .hero {
         gap: 1.75rem;
-        justify-content: flex-start;
-        padding-top: clamp(2rem, 8vh, 4.5rem);
+        justify-content: center;
+        padding-top: 2.5rem;
         padding-bottom: 2.5rem;
     }
 
